@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">LocAcc</string>
+    <string name="h_latitude">latitude</string>
+    <string name="h_longitude">longitude</string>
+    <string name="h_speed">speed</string>
+    <string name="h_accuracy">accuracy</string>
+    <string name="h_bearing">bearing</string>
+    <string name="h_x">x</string>
+    <string name="h_y">y</string>
+    <string name="h_z">z</string>
+    <string name="h_altitude">altitude</string>
+    <string name="h_accelerometer">Accelerometer</string>
+    <string name="h_record">record</string>
+    <string name="h_stop_record">stop recording</string>
+    <string name="t_no_permission">No location permission</string>
+    <string name="t_service_description">GPS and accelerometer service</string>
+</resources>
