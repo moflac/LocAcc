@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.provider.DocumentsContract;
 import android.util.Log;
 
@@ -40,9 +41,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -54,7 +57,7 @@ public class SenService extends Service implements SensorEventListener {
     private final IBinder binder = new LocalBinder();
 
     private long UPDATE_INTERVAL =  1 * 1000;  /* 10 secs */
-    private long FASTEST_INTERVAL = 1000; /* 2 sec */
+    //private long FASTEST_INTERVAL = 500; /* 0.5 sec */
     private float[] gravity = new float[3];
     private float[] linear_acceleration = new float[3];
     private int zeroes = 0;
@@ -66,9 +69,11 @@ public class SenService extends Service implements SensorEventListener {
     // current location
     private Location curLocation;
 
+    int i=0;
+
     // data structures used to write to file
     DataRow storedData;
-    ArrayList<DataRow> storedRows;
+    private ArrayList<DataRow> storedRows = new ArrayList<>();
     DataWriter mWriter = new DataWriter();
 
 
@@ -82,7 +87,7 @@ public class SenService extends Service implements SensorEventListener {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        simpleFormat = new SimpleDateFormat("yy-MM-dd_HH:mm:ss.SSS");
+        simpleFormat = new SimpleDateFormat("yy-MM-dd_HH:mm:ss.SSS", Locale.getDefault());
 
         String input = intent.getStringExtra("inputExtra");
         createNotificationChannel();
@@ -90,8 +95,8 @@ public class SenService extends Service implements SensorEventListener {
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("")
-                .setContentText(input)
+                .setContentTitle(DateFormat.getDateTimeInstance().format(new Date()))
+                .setContentText("ee")
                 .setSmallIcon(R.drawable.location96)
                 .setContentIntent(pendingIntent)
                 .build();
@@ -103,6 +108,9 @@ public class SenService extends Service implements SensorEventListener {
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+       // PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+       // PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LocAcc:tag");
+       // wl.acquire(10000);
 
         return START_NOT_STICKY;
     }
@@ -126,7 +134,7 @@ public class SenService extends Service implements SensorEventListener {
             manager.createNotificationChannel(serviceChannel);
         }
     }
-    private void sendLocationToActivity(Location loc) {
+    private void sendLocationToActivity(Location loc, int j) {
         Bundle b = new Bundle();
         b.putParcelable("Location", loc);
 
@@ -134,6 +142,7 @@ public class SenService extends Service implements SensorEventListener {
         // You can also include some extra data.
         //intent.putExtra("Location", loc);
         intent.putExtra("Location", b);
+        intent.putExtra("counter",j);
        // Bundle b = new Bundle();
        // b.putParcelable("Location", l);
        // intent.putExtra("Location", b);
@@ -156,7 +165,7 @@ public class SenService extends Service implements SensorEventListener {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(UPDATE_INTERVAL);
-        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        //mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
 
 
 
@@ -178,7 +187,8 @@ public class SenService extends Service implements SensorEventListener {
 
                         ddate=simpleFormat.format( new Date() );
                         curLocation=locationResult.getLastLocation();
-                        sendLocationToActivity(curLocation);
+                        sendLocationToActivity(curLocation, i);
+                        i++;
                         // store data to arraylist if button is pressed
                         if(recording == true)
                         {
@@ -219,7 +229,7 @@ public class SenService extends Service implements SensorEventListener {
             }
         }
        if (pass == true || zeroes < 2)
-        {   Log.i("service", Float.toString(linear_acceleration[0])+" x "+ Integer.toString(zeroes));
+        {   Log.i("service", linear_acceleration[0]+" x "+ zeroes);
             pass = false;
             sendAccelerationToActivity(linear_acceleration);
 
@@ -264,6 +274,7 @@ public class SenService extends Service implements SensorEventListener {
             storedRows.add(trow);
         }
     }
+
 
     public class LocalBinder extends Binder {
         SenService getService() {

@@ -3,8 +3,9 @@
     package="com.moflac.locacc">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 
     <application
         android:allowBackup="true"
@@ -13,14 +14,6 @@
         android:roundIcon="@mipmap/la_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service
-            android:name=".SenService"
-            android:enabled="true"
-            android:exported="false"
-            android:description="@string/t_service_description">
-
-        </service>
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +21,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".SenService"
+            android:enabled="true"
+            android:exported="true"
+            android:description="@string/t_service_description" >
+        </service>
+
     </application>
 
 </manifest>

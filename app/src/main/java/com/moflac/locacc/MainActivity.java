@@ -40,12 +40,13 @@ public class MainActivity extends Activity {
     TextView txtX;
     TextView txtY;
     TextView txtZ;
+    TextView txtCounter;
     ToggleButton toggle;
+    int i=0;
 
        // background service
-    SenService mService;
-    boolean mBound = false;
-
+    private SenService mService = null;
+    private boolean mBound = false;
     DecimalFormat df = new DecimalFormat("#.##");
     private BroadcastReceiver broadcastReceiver;
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
@@ -94,6 +95,7 @@ public class MainActivity extends Activity {
                 if(intent!=null) {
                     // get and set gps values
                     Bundle b = intent.getBundleExtra("Location");
+                    int j = intent.getIntExtra("counter",0);
                     if (b != null) {
 
 
@@ -104,12 +106,16 @@ public class MainActivity extends Activity {
                         txtSpeed = (TextView) findViewById(R.id.textView11);
                         txtAltitude = (TextView) findViewById(R.id.textView10);
                         txtAccuracy = (TextView) findViewById(R.id.textView12);
+                        txtCounter = (TextView) findViewById(R.id.textView15);
                         txtLat.setText(Double.toString(lastLoc.getLatitude()));
                         txtLong.setText(Double.toString(lastLoc.getLongitude()));
                         txtBearing.setText(Float.toString(lastLoc.getBearing()));
                         txtSpeed.setText(df.format(lastLoc.getSpeed() * 3.6) + " km/h");
                         txtAltitude.setText(df.format(lastLoc.getAltitude()));
                         txtAccuracy.setText(Float.toString(lastLoc.getAccuracy()));
+                        txtCounter.setText(Integer.toString(j));
+
+
                     }
 
                     // set acceleration values
@@ -131,13 +137,31 @@ public class MainActivity extends Activity {
     }
     @Override
     protected void onStop() {
+
+
         super.onStop();
-         // unregister the receiver when the activity is destroyed
-        if(broadcastReceiver != null) {
+    }
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        // unregister the receiver when the activity is destroyed
+
             unregisterReceiver(broadcastReceiver);
-        }
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(broadcastReceiver, new IntentFilter("GPSAccUpdate"));
+        registerReceiver(broadcastReceiver, new IntentFilter("AccUpdate"));
+
     }
 
+    @Override
+    protected void onPause() {
+       //unregisterReceiver(broadcastReceiver);
+        super.onPause();
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -157,8 +181,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private ServiceConnection connection = new ServiceConnection() {
-
+    private final ServiceConnection connection = new ServiceConnection() {
 
 
         @Override

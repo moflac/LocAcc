@@ -1,6 +1,6 @@
 package com.moflac.locacc;
 
-import java.text.SimpleDateFormat;
+
 
 public class DataRow {
     public String time;
