@@ -56,7 +56,7 @@ public class SenService extends Service implements SensorEventListener {
     private Sensor sensor;
     private final IBinder binder = new LocalBinder();
 
-    private long UPDATE_INTERVAL =  1 * 1000;  /* 10 secs */
+    private long UPDATE_INTERVAL =  5 * 1000;  /* 10 secs */
     //private long FASTEST_INTERVAL = 500; /* 0.5 sec */
     private float[] gravity = new float[3];
     private float[] linear_acceleration = new float[3];
@@ -68,6 +68,7 @@ public class SenService extends Service implements SensorEventListener {
     private boolean recording = false;
     // current location
     private Location curLocation;
+
 
     int i=0;
 
@@ -87,7 +88,7 @@ public class SenService extends Service implements SensorEventListener {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        simpleFormat = new SimpleDateFormat("yy-MM-dd_HH:mm:ss.SSS", Locale.getDefault());
+        simpleFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
 
         String input = intent.getStringExtra("inputExtra");
         createNotificationChannel();
@@ -96,9 +97,13 @@ public class SenService extends Service implements SensorEventListener {
                 0, notificationIntent, 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(DateFormat.getDateTimeInstance().format(new Date()))
-                .setContentText("ee")
+                .setContentText("")
+                .addAction(R.drawable.closewindow24, getString(R.string.t_quit),
+                        pendingIntent)
                 .setSmallIcon(R.drawable.location96)
                 .setContentIntent(pendingIntent)
+
+
                 .build();
         startForeground(111, notification);
         startLocationUpdates();
@@ -138,7 +143,7 @@ public class SenService extends Service implements SensorEventListener {
         Bundle b = new Bundle();
         b.putParcelable("Location", loc);
 
-        Intent intent = new Intent("GPSAccUpdate");
+        Intent intent = new Intent("GPSUpdate");
         // You can also include some extra data.
         //intent.putExtra("Location", loc);
         intent.putExtra("Location", b);
@@ -188,11 +193,12 @@ public class SenService extends Service implements SensorEventListener {
                         ddate=simpleFormat.format( new Date() );
                         curLocation=locationResult.getLastLocation();
                         sendLocationToActivity(curLocation, i);
+
                         i++;
                         // store data to arraylist if button is pressed
                         if(recording == true)
                         {
-                            saveRow(ddate, curLocation);
+                            saveRow(ddate, curLocation, i);
                         }
                     }
                 },
@@ -244,7 +250,7 @@ public class SenService extends Service implements SensorEventListener {
 
     public void startRecording(){
         recording = true;
-        storedRows = new ArrayList<>();
+        storedRows.clear();
       //  String tmpTime = timeStampFormat.format( new Date() );
       //  Log.i("xxxx",tmpTime);
     }
@@ -256,7 +262,7 @@ public class SenService extends Service implements SensorEventListener {
 
     }
 
-    public void saveRow(String date, Location loc) {
+    public void saveRow(String date, Location loc, int i) {
         // add current data on arraylist
         if(storedRows!=null) {
             DataRow trow = new DataRow();
@@ -269,7 +275,7 @@ public class SenService extends Service implements SensorEventListener {
             trow.speed = loc.getSpeed();
             trow.x = linear_acceleration[0];
             trow.y = linear_acceleration[1];
-            trow.z = linear_acceleration[2];
+            trow.z = Float.valueOf(i); //linear_acceleration[2];
 
             storedRows.add(trow);
         }

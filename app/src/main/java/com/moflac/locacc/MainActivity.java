@@ -132,7 +132,7 @@ public class MainActivity extends Activity {
                 }
             }
         };
-        registerReceiver(broadcastReceiver, new IntentFilter("GPSAccUpdate"));
+        registerReceiver(broadcastReceiver, new IntentFilter("GPSUpdate"));
         registerReceiver(broadcastReceiver, new IntentFilter("AccUpdate"));
     }
     @Override
@@ -152,8 +152,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(broadcastReceiver, new IntentFilter("GPSAccUpdate"));
-        registerReceiver(broadcastReceiver, new IntentFilter("AccUpdate"));
+        //registerReceiver(broadcastReceiver, new IntentFilter("GPSAccUpdate"));
+        //registerReceiver(broadcastReceiver, new IntentFilter("AccUpdate"));
 
     }
 

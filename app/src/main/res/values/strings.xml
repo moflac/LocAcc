@@ -14,4 +14,7 @@
     <string name="h_stop_record">stop recording</string>
     <string name="t_no_permission">No location permission</string>
     <string name="t_service_description">GPS and accelerometer service</string>
+    <string name="t_exit">Exit</string>
+    <string name="t_quit">Quit</string>
+    <string name="h_time">time</string>
 </resources>
