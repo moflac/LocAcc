@@ -88,13 +88,16 @@ public class SenService extends Service implements SensorEventListener {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        simpleFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        simpleFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
 
         String input = intent.getStringExtra("inputExtra");
         createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
+       // Intent quitIntent = new Intent (this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
+        //notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        //PendingIntent pendingQuitIntent = PendingIntent.getActivity(this, 1, quitIntent, 1);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(DateFormat.getDateTimeInstance().format(new Date()))
                 .setContentText("")
@@ -275,7 +278,7 @@ public class SenService extends Service implements SensorEventListener {
             trow.speed = loc.getSpeed();
             trow.x = linear_acceleration[0];
             trow.y = linear_acceleration[1];
-            trow.z = Float.valueOf(i); //linear_acceleration[2];
+            trow.z = linear_acceleration[2];
 
             storedRows.add(trow);
         }
