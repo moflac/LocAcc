@@ -12,7 +12,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,7 +23,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -53,7 +51,7 @@ public class MainActivity extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_main);
         registerReceiver();
 
         toggle = (ToggleButton)findViewById(R.id.toggleButton);
@@ -75,13 +73,14 @@ public class MainActivity extends Activity {
         //startService();
     }
 
-    // start service for location and accelerometer in foreground
+    // start service for location and accelerometer
     public void startService() {
         Intent serviceIntent = new Intent(this, SenService.class);
         // bind service for button controls
         bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
 
-        ContextCompat.startForegroundService(this, serviceIntent);
+        //ContextCompat.startForegroundService(this, serviceIntent);
+        startService(serviceIntent);
     }
 
     // register broadcast receiver for location and acceleration values

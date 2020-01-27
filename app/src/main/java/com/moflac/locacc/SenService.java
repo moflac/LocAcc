@@ -91,7 +91,7 @@ public class SenService extends Service implements SensorEventListener {
         simpleFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault());
 
         String input = intent.getStringExtra("inputExtra");
-        createNotificationChannel();
+     /*   createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
        // Intent quitIntent = new Intent (this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
@@ -107,8 +107,8 @@ public class SenService extends Service implements SensorEventListener {
                 .setContentIntent(pendingIntent)
 
 
-                .build();
-        startForeground(111, notification);
+                .build();*/
+        //startForeground(111, notification);
         startLocationUpdates();
         // sendMessageToActivity("hello");
         //do heavy work on a background thread
@@ -254,11 +254,13 @@ public class SenService extends Service implements SensorEventListener {
     public void startRecording(){
         recording = true;
         storedRows.clear();
+        startForeground(111, getNotification());
       //  String tmpTime = timeStampFormat.format( new Date() );
       //  Log.i("xxxx",tmpTime);
     }
     public void stopRecording(){
         recording = false;
+        stopForeground(true);
         mWriter.writeFile(storedRows, this);
 
 
@@ -290,6 +292,25 @@ public class SenService extends Service implements SensorEventListener {
             // Return this instance of LocalService so clients can call public methods
             return SenService.this;
         }
+    }
+    private Notification getNotification() {
+        Intent notificationIntent = new Intent(this,  MainActivity.class);
+
+
+        // The PendingIntent to launch activity.
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+               notificationIntent,  0);
+        // build notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentTitle(getString(R.string.n_text)+": "+DateFormat.getDateTimeInstance().format(new Date()))
+                .setSmallIcon(R.drawable.location96)
+                .setContentIntent(pendingIntent);
+
+        // Set the Channel ID for Android O.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(CHANNEL_ID); // Channel ID
+        }
+        return builder.build();
     }
 
 }
