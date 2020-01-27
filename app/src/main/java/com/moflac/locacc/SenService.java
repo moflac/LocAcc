@@ -226,8 +226,8 @@ public class SenService extends Service implements SensorEventListener {
         // leave out small jitters
         for(int i=0; i<3; i++)
         {
-            if (linear_acceleration[i] < 0.01f) {
-                linear_acceleration[i] = 0f;
+            if (linear_acceleration[i] < 0.001f) {
+                linear_acceleration[i] = 0.000f;
 
             }
             else
@@ -238,7 +238,7 @@ public class SenService extends Service implements SensorEventListener {
             }
         }
        if (pass == true || zeroes < 2)
-        {   Log.i("service", linear_acceleration[0]+" x "+ zeroes);
+        {   //Log.i("service", linear_acceleration[0]+" x "+ zeroes);
             pass = false;
             sendAccelerationToActivity(linear_acceleration);
 

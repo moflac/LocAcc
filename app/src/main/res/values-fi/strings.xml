@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LocAcc</string>
+    <string name="h_accelerometer">Kiihtyvyys</string>
+    <string name="h_accuracy">tarkkuus</string>
+    <string name="h_altitude">korkeus</string>
+    <string name="h_bearing">suunta</string>
+    <string name="h_latitude">leveys</string>
+    <string name="h_longitude">pituus</string>
+    <string name="h_record">tallenna</string>
+    <string name="h_speed">nopeus</string>
+    <string name="h_stop_record">lopeta tallennus</string>
+    <string name="h_time">aika</string>
+    <string name="h_x">x</string>
+    <string name="h_y">y</string>
+    <string name="h_z">z</string>
+    <string name="n_text">Tallennus alkoi</string>
+    <string name="t_exit">Poistu</string>
+    <string name="t_no_permission">Ei lupaa paikannukselle</string>
+    <string name="t_quit">Lopeta</string>
+    <string name="t_service_description">GPS and accelerometer service</string>
+</resources>

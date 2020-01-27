@@ -23,6 +23,9 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
@@ -45,7 +48,8 @@ public class MainActivity extends Activity {
        // background service
     private SenService mService = null;
     private boolean mBound = false;
-    DecimalFormat df = new DecimalFormat("#.##");
+    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+    DecimalFormat df = new DecimalFormat("#0.000", symbols);
     private BroadcastReceiver broadcastReceiver;
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
@@ -123,6 +127,7 @@ public class MainActivity extends Activity {
                         txtX = (TextView) findViewById(R.id.textView17);
                         txtY = (TextView) findViewById(R.id.textView19);
                         txtZ = (TextView) findViewById(R.id.textView20);
+
                         txtX.setText(df.format(accel[0])+" m/s²");
                         txtY.setText(df.format(accel[1])+" m/s²");
                         txtZ.setText(df.format(accel[2])+" m/s²");
@@ -151,6 +156,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        registerReceiver();
         //registerReceiver(broadcastReceiver, new IntentFilter("GPSAccUpdate"));
         //registerReceiver(broadcastReceiver, new IntentFilter("AccUpdate"));
 
@@ -158,7 +164,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-       //unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(broadcastReceiver);
         super.onPause();
     }
 
