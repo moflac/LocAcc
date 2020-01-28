@@ -3,7 +3,6 @@ package com.moflac.locacc;
 import android.content.Context;
 import android.content.res.Resources;
 import android.media.MediaScannerConnection;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedWriter;
@@ -14,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-
+// Writes data on file after recordings
 public class DataWriter {
     private SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
     private String fileName;
@@ -25,13 +24,14 @@ public class DataWriter {
         try {
             // Creates a file in the external storage space of the app
             // If the file does not exists, it is created.
+            // file name constructed from gps prefix and time of writing
             fileName="gps_"+timeStampFormat.format( new Date() )+".csv";
-            File testFile = new File(con.getExternalFilesDir(null), fileName);
-            if (!testFile.exists()) {
-                testFile.createNewFile();
+            File tFile = new File(con.getExternalFilesDir(null), fileName);
+            if (!tFile.exists()) {
+                tFile.createNewFile();
             }
-            // Adds a line to the file
-            BufferedWriter writer = new BufferedWriter(new FileWriter(testFile, true));
+            // write headers
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tFile, true));
             writer.write(res.getString(R.string.h_time)+";");
             writer.write(res.getString(R.string.h_latitude)+";");
             writer.write(res.getString(R.string.h_longitude)+";");
@@ -42,6 +42,7 @@ public class DataWriter {
             writer.write(res.getString(R.string.h_y)+";");
             writer.write(res.getString(R.string.h_z));
             writer.newLine();
+            // write values
             for(int i=0; i < dlist.size(); i++)
             {
                 writer.write(dlist.get(i).time+";");
@@ -56,18 +57,9 @@ public class DataWriter {
                 writer.newLine();
 
             }
-            //writer.write("This is a test file.");
-            //writer.newLine();
-            //writer.write("okei");
             writer.close();
-            // Refresh the data so it can seen when the device is plugged in a
-            // computer. You may have to unplug and replug the device to see the
-            // latest changes. This is not necessary if the user should not modify
-            // the files.
-            MediaScannerConnection.scanFile(con,
-                    new String[]{testFile.toString()},
-                    null,
-                    null);
+            // Refresh the data
+            MediaScannerConnection.scanFile(con,  new String[]{tFile.toString()}, null, null);
         } catch (
                 IOException e) {
             Toast toast = Toast.makeText(con, "Error writing to file", Toast.LENGTH_SHORT);

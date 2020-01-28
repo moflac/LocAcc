@@ -238,7 +238,7 @@ public class SenService extends Service implements SensorEventListener {
             }
         }
        if (pass == true || zeroes < 2)
-        {   //Log.i("service", linear_acceleration[0]+" x "+ zeroes);
+        {
             pass = false;
             sendAccelerationToActivity(linear_acceleration);
 
@@ -251,13 +251,14 @@ public class SenService extends Service implements SensorEventListener {
 
     }
 
+    // record button pressed, start service in foreground with notification
     public void startRecording(){
         recording = true;
         storedRows.clear();
         startForeground(111, getNotification());
-      //  String tmpTime = timeStampFormat.format( new Date() );
-      //  Log.i("xxxx",tmpTime);
+
     }
+    // recording stopped, move service to background and write values to a file
     public void stopRecording(){
         recording = false;
         stopForeground(true);
@@ -277,7 +278,7 @@ public class SenService extends Service implements SensorEventListener {
             trow.bearing = loc.getBearing();
             trow.latitude = loc.getLatitude();
             trow.longitude = loc.getLongitude();
-            trow.speed = loc.getSpeed();
+            trow.speed = loc.getSpeed()*3.6f;
             trow.x = linear_acceleration[0];
             trow.y = linear_acceleration[1];
             trow.z = linear_acceleration[2];

@@ -1,6 +1,6 @@
 package com.moflac.locacc;
 
-
+// class to store one row of collected data
 
 public class DataRow {
     public String time;

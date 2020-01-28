@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,18 +17,14 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.content.ServiceConnection;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.Locale;
 
-import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MainActivity extends Activity {
 
@@ -41,15 +38,14 @@ public class MainActivity extends Activity {
     TextView txtX;
     TextView txtY;
     TextView txtZ;
-    TextView txtCounter;
+    // record button
     ToggleButton toggle;
     int i=0;
 
-       // background service
+    // service collecting, providing and writing data
     private SenService mService = null;
     private boolean mBound = false;
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-    DecimalFormat df = new DecimalFormat("#0.000", symbols);
+
     private BroadcastReceiver broadcastReceiver;
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
@@ -63,18 +59,18 @@ public class MainActivity extends Activity {
         //startLocationUpdates();
 
         // check permissions
-        if ( Build.VERSION.SDK_INT >= 23){
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                !=  PackageManager.PERMISSION_GRANTED  ){
+
+         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            !=  PackageManager.PERMISSION_GRANTED  ){
                 requestPermissions(new String[]{
                                     android.Manifest.permission.ACCESS_FINE_LOCATION },
                                     REQUEST_CODE_ASK_PERMISSIONS);
-                        return ;
-            }
-            else
+                return ;
+         }
+         else
                 startService();
-        }
-        //startService();
+
+
     }
 
     // start service for location and accelerometer
@@ -83,7 +79,6 @@ public class MainActivity extends Activity {
         // bind service for button controls
         bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
 
-        //ContextCompat.startForegroundService(this, serviceIntent);
         startService(serviceIntent);
     }
 
@@ -98,10 +93,9 @@ public class MainActivity extends Activity {
                 if(intent!=null) {
                     // get and set gps values
                     Bundle b = intent.getBundleExtra("Location");
-                    int j = intent.getIntExtra("counter",0);
+
                     if (b != null) {
-
-
+                        // get textviews
                         Location lastLoc = (Location) b.getParcelable("Location");
                         txtLat = (TextView) findViewById(R.id.textView5);
                         txtLong = (TextView) findViewById(R.id.textView6);
@@ -109,15 +103,13 @@ public class MainActivity extends Activity {
                         txtSpeed = (TextView) findViewById(R.id.textView11);
                         txtAltitude = (TextView) findViewById(R.id.textView10);
                         txtAccuracy = (TextView) findViewById(R.id.textView12);
-                        txtCounter = (TextView) findViewById(R.id.textView15);
-                        txtLat.setText(Double.toString(lastLoc.getLatitude()));
-                        txtLong.setText(Double.toString(lastLoc.getLongitude()));
-                        txtBearing.setText(Float.toString(lastLoc.getBearing()));
-                        txtSpeed.setText(df.format(lastLoc.getSpeed() * 3.6) + " km/h");
-                        txtAltitude.setText(df.format(lastLoc.getAltitude()));
-                        txtAccuracy.setText(Float.toString(lastLoc.getAccuracy()));
-                        txtCounter.setText(Integer.toString(j));
-
+                        // set textview data (with locale specific decimal separator :)
+                        txtLat.setText(String.format("%f", lastLoc.getLatitude()));
+                        txtLong.setText(String.format("%f", lastLoc.getLongitude()));
+                        txtBearing.setText(String.format("%.2f", lastLoc.getBearing()));
+                        txtSpeed.setText(String.format("%.2f", lastLoc.getSpeed() * 3.6) + " km/h");
+                        txtAltitude.setText(String.format("%.2f", lastLoc.getAltitude()) + " m");
+                        txtAccuracy.setText(String.format("%.2f", lastLoc.getAccuracy())+ " m");
 
                     }
 
@@ -127,15 +119,16 @@ public class MainActivity extends Activity {
                         txtX = (TextView) findViewById(R.id.textView17);
                         txtY = (TextView) findViewById(R.id.textView19);
                         txtZ = (TextView) findViewById(R.id.textView20);
+                        // with three decimal accuracy
+                        txtX.setText(String.format("%.3f", accel[0])+" m/s²");
+                        txtY.setText(String.format("%.3f", accel[1])+" m/s²");
+                        txtZ.setText(String.format("%.3f", accel[2])+" m/s²");
 
-                        txtX.setText(df.format(accel[0])+" m/s²");
-                        txtY.setText(df.format(accel[1])+" m/s²");
-                        txtZ.setText(df.format(accel[2])+" m/s²");
-                        //txtZ.setText(mService.getDate());
                     }
                 }
             }
         };
+        // register receivers for location and acceleration intents
         registerReceiver(broadcastReceiver, new IntentFilter("GPSUpdate"));
         registerReceiver(broadcastReceiver, new IntentFilter("AccUpdate"));
     }
@@ -157,8 +150,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         registerReceiver();
-        //registerReceiver(broadcastReceiver, new IntentFilter("GPSAccUpdate"));
-        //registerReceiver(broadcastReceiver, new IntentFilter("AccUpdate"));
+
 
     }
 
@@ -188,7 +180,6 @@ public class MainActivity extends Activity {
 
     private final ServiceConnection connection = new ServiceConnection() {
 
-
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             // IBinder and get LocalService instance
@@ -203,16 +194,30 @@ public class MainActivity extends Activity {
         }
     };
 
+    // when recording toggle is pressed
     public void onToggleClicked(View view) {
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
-
+        // on - start recording
         if (on) {
             mService.startRecording();
-
+        // off - stop recording, save on file
         } else {
             mService.stopRecording();
         }
     }
+
+    // change layout when orientation changed
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_main);
+        } else {
+            setContentView(R.layout.activity_main);
+        }
+    }
+
 }
+
 
