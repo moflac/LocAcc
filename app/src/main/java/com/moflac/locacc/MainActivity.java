@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
@@ -52,8 +51,6 @@ public class MainActivity extends Activity {
         registerReceiver();
 
         toggle = (ToggleButton)findViewById(R.id.toggleButton);
-
-        //startLocationUpdates();
 
         // check permissions
 
