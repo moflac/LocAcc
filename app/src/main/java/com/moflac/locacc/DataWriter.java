@@ -68,7 +68,7 @@ public class DataWriter {
             Toast toast = Toast.makeText(con, "Error writing to file", Toast.LENGTH_SHORT);
         }
         // get file directory and show it in toast
-        String text =  con.getExternalFilesDir(null).toString()+"/"+fileName;
+        String text =  con.getResources().getString(R.string.to_file_saved)+" "+con.getExternalFilesDir(null).toString()+"/"+fileName;
         int duration = Toast.LENGTH_LONG;
 
         Toast toast = Toast.makeText(con, text, duration);

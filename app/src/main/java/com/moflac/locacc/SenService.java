@@ -20,6 +20,8 @@ import android.os.IBinder;
 import android.os.Looper;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationCompat.Builder;
+
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -34,6 +36,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+import static java.text.DateFormat.*;
 
 public class SenService extends Service implements SensorEventListener {
     public static final String CHANNEL_ID = "LocAcc";
@@ -82,19 +85,15 @@ public class SenService extends Service implements SensorEventListener {
     }
     @Override
     public void onDestroy() {
-      /*  if(recording == true)
-        {
-            stopRecording();
-        } */
-      stopForeground(true);
-        super.onDestroy();
+       stopForeground(true);
+       super.onDestroy();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
     }
-    private void createNotificationChannel() {
+   /* private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
@@ -105,7 +104,7 @@ public class SenService extends Service implements SensorEventListener {
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
         }
-    }
+    } */
     private void sendLocationToActivity(Location loc, int j) {
         Bundle b = new Bundle();
         b.putParcelable("Location", loc);
@@ -172,27 +171,6 @@ public class SenService extends Service implements SensorEventListener {
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
 
-        // leave out small jitters
-       /* for(int i=0; i<3; i++)
-        {
-            if (linear_acceleration[i] < 0.001f) {
-                linear_acceleration[i] = 0.000f;
-
-            }
-            else
-            {
-                pass = true;
-                zeroes = 0;
-
-            }
-        }
-       if (pass == true || zeroes < 2)
-        {
-            pass = false;
-            sendAccelerationToActivity(linear_acceleration);
-
-       }
-       zeroes++;*/
         sendAccelerationToActivity(linear_acceleration);
     }
 
@@ -245,21 +223,22 @@ public class SenService extends Service implements SensorEventListener {
         }
     }
     private Notification getNotification() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
+        String ndate=sdf.format( new Date() );
         Intent notificationIntent = new Intent(this,  MainActivity.class);
 
         // The PendingIntent to launch activity.
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                notificationIntent,  0);
         // build notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(getString(R.string.n_text)+": "+DateFormat.getDateTimeInstance().format(new Date()))
+        Builder builder;
+        builder = new Builder(this, CHANNEL_ID)
+                // started at time...
+                .setContentTitle(getString(R.string.n_text)+": "+ ndate)
+                // notification icon
                 .setSmallIcon(R.drawable.location96)
                 .setContentIntent(pendingIntent);
 
-        // Set the Channel ID for Android O.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setChannelId(CHANNEL_ID); // Channel ID
-        }
         return builder.build();
     }
 

@@ -19,4 +19,5 @@
     <string name="t_no_permission">Ei lupaa paikannukselle</string>
     <string name="t_quit">Lopeta</string>
     <string name="t_service_description">GPS and accelerometer service</string>
+    <string name="to_file_saved">Tallennettu</string>
 </resources>

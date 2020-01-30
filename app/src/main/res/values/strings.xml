@@ -18,4 +18,6 @@
     <string name="t_quit">Quit</string>
     <string name="h_time">time</string>
     <string name="n_text">Recording started</string>
+    <string name="to_file_saved">Saved at</string>
+
 </resources>
