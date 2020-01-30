@@ -15,6 +15,7 @@ import java.util.Date;
 
 // Writes data on file after recordings
 public class DataWriter {
+    // time of writing
     private SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
     private String fileName;
 
@@ -36,6 +37,7 @@ public class DataWriter {
             writer.write(res.getString(R.string.h_latitude)+";");
             writer.write(res.getString(R.string.h_longitude)+";");
             writer.write(res.getString(R.string.h_bearing)+";");
+            writer.write(res.getString(R.string.h_altitude)+";");
             writer.write(res.getString(R.string.h_speed)+";");
             writer.write(res.getString(R.string.h_accuracy)+";");
             writer.write(res.getString(R.string.h_x)+";");
@@ -45,15 +47,16 @@ public class DataWriter {
             // write values
             for(int i=0; i < dlist.size(); i++)
             {
-                writer.write(dlist.get(i).time+";");
-                writer.write(String.valueOf(dlist.get(i).latitude+";"));
-                writer.write(String.valueOf(dlist.get(i).longitude+";"));
-                writer.write(String.valueOf(dlist.get(i).bearing+";"));
-                writer.write(String.valueOf(dlist.get(i).speed+";"));
-                writer.write(String.valueOf(dlist.get(i).accuracy+";"));
-                writer.write(String.valueOf(dlist.get(i).x+";"));
-                writer.write(String.valueOf(dlist.get(i).y+";"));
-                writer.write(String.valueOf(dlist.get(i).z));
+                writer.write(dlist.get(i).getTime()+";");
+                writer.write(String.valueOf(dlist.get(i).getLatitude()+";"));
+                writer.write(String.valueOf(dlist.get(i).getLongitude()+";"));
+                writer.write(String.valueOf(dlist.get(i).getBearing()+";"));
+                writer.write(String.valueOf(dlist.get(i).getAltitude()+";"));
+                writer.write(String.valueOf(dlist.get(i).getSpeed()+";"));
+                writer.write(String.valueOf(dlist.get(i).getAccuracy()+";"));
+                writer.write(String.valueOf(dlist.get(i).getX()+";"));
+                writer.write(String.valueOf(dlist.get(i).getY()+";"));
+                writer.write(String.valueOf(dlist.get(i).getZ()));
                 writer.newLine();
 
             }
@@ -65,7 +68,7 @@ public class DataWriter {
             Toast toast = Toast.makeText(con, "Error writing to file", Toast.LENGTH_SHORT);
         }
         // get file directory and show it in toast
-        String text =  con.getExternalFilesDir(null).toString()+"/"+fileName+" "+dlist.size();
+        String text =  con.getExternalFilesDir(null).toString()+"/"+fileName;
         int duration = Toast.LENGTH_LONG;
 
         Toast toast = Toast.makeText(con, text, duration);

@@ -21,10 +21,6 @@ import android.content.ServiceConnection;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 
 public class MainActivity extends Activity {
 
@@ -40,7 +36,8 @@ public class MainActivity extends Activity {
     TextView txtZ;
     // record button
     ToggleButton toggle;
-    int i=0;
+    // record button status
+    boolean onToggle;
 
     // service collecting, providing and writing data
     private SenService mService = null;
@@ -120,9 +117,13 @@ public class MainActivity extends Activity {
                         txtY = (TextView) findViewById(R.id.textView19);
                         txtZ = (TextView) findViewById(R.id.textView20);
                         // with three decimal accuracy
-                        txtX.setText(String.format("%.3f", accel[0])+" m/s²");
-                        txtY.setText(String.format("%.3f", accel[1])+" m/s²");
-                        txtZ.setText(String.format("%.3f", accel[2])+" m/s²");
+                        for(int i = 0; i<3; i++ ) {
+                            if (Math.abs(accel[i]) < 0.01)
+                                accel[i] = 0;
+                        }
+                        txtX.setText(String.format("%.2f", accel[0])+" m/s²");
+                        txtY.setText(String.format("%.2f", accel[1])+" m/s²");
+                        txtZ.setText(String.format("%.2f", accel[2])+" m/s²");
 
                     }
                 }
@@ -134,29 +135,31 @@ public class MainActivity extends Activity {
     }
     @Override
     protected void onStop() {
-
-
         super.onStop();
     }
     @Override
     protected void onDestroy(){
+        // if still recording, save to file
+        mService.stopRecording();
+        unregisterReceiver(broadcastReceiver);
+        unbindService(connection);
+
         super.onDestroy();
         // unregister the receiver when the activity is destroyed
 
-            unregisterReceiver(broadcastReceiver);
 
     }
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver();
+       // registerReceiver();
 
 
     }
 
     @Override
     protected void onPause() {
-        unregisterReceiver(broadcastReceiver);
+        //unregisterReceiver(broadcastReceiver);
         super.onPause();
     }
 
@@ -197,9 +200,9 @@ public class MainActivity extends Activity {
     // when recording toggle is pressed
     public void onToggleClicked(View view) {
         // Is the toggle on?
-        boolean on = ((ToggleButton) view).isChecked();
+        onToggle = ((ToggleButton) view).isChecked();
         // on - start recording
-        if (on) {
+        if (onToggle) {
             mService.startRecording();
         // off - stop recording, save on file
         } else {
@@ -211,10 +214,17 @@ public class MainActivity extends Activity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setContentView(R.layout.activity_main);
         } else {
             setContentView(R.layout.activity_main);
+        }
+        // restore toggle status
+        if(onToggle)
+        {
+            ToggleButton tgl=(ToggleButton)findViewById(R.id.toggleButton);
+            tgl.setChecked(true);
         }
     }
 
