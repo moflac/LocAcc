@@ -170,9 +170,13 @@ public class SenService extends Service implements SensorEventListener {
     }
     // recording stopped, move service to background and write values to a file
     public void stopRecording(){
-        recording = false;
+
         stopForeground(true);
-        mWriter.writeFile(storedRows, this);
+        // IF recording, save file
+        if(recording) {
+            mWriter.writeFile(storedRows, this);
+            recording = false;
+        }
 
 
 
